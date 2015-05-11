@@ -23,5 +23,13 @@
         android:id="@+id/resetDataButton"
         android:layout_gravity="right|bottom" />
 
+    <SeekBar
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seedInterval"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="75dp"
+        android:contentDescription="Seed interval" />
+
 
 </FrameLayout>

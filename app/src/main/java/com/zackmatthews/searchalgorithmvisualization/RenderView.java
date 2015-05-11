@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Display;
@@ -14,6 +16,9 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.SeekBar;
+
+import java.sql.SQLSyntaxErrorException;
 import java.util.List;
 
 
@@ -29,6 +34,8 @@ public class RenderView extends View implements SurfaceHolder {
 
     private Button resetDataButton = null;
     private Button sortButton = null;
+    private SeekBar seedInterval = null;
+
 
     public static Point screenSize = new Point();
 
@@ -91,6 +98,8 @@ public class RenderView extends View implements SurfaceHolder {
 
         canvas.drawColor(Color.BLACK); //render background
 
+        List<DataObject> dataObjects = sortingManager.getDataSet();
+
         for(int i = 0; i < dataObjects.size(); i++){ //render each data object to screen
 
             if(dataObjects.get(i) != null) {
@@ -100,6 +109,16 @@ public class RenderView extends View implements SurfaceHolder {
             }
         }
 
+        checkUIInit();
+
+
+    }
+
+
+
+
+    public void checkUIInit(){
+
 
         if(sortButton == null){ //check that sort button has initialized
             try {
@@ -107,9 +126,8 @@ public class RenderView extends View implements SurfaceHolder {
                 sortButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
                         sortingManager.executeMergeSort();
-                        dataObjects = sortingManager.getDataSet();
+
                     }
                 });
             }
@@ -127,8 +145,8 @@ public class RenderView extends View implements SurfaceHolder {
                     @Override
                     public void onClick(View v) {
 
-                       sortingManager.seedData(screenSize);
-                        dataObjects = sortingManager.getDataSet();
+                        sortingManager.seedData(screenSize, seedInterval.getProgress() + 5);
+
                     }
                 });
             }
@@ -137,12 +155,19 @@ public class RenderView extends View implements SurfaceHolder {
 
             }
         }
+
+        if(seedInterval == null){ //check that reset button has initialized
+            try {
+                seedInterval= (SeekBar) this.getRootView().findViewById(R.id.seedInterval);
+                seedInterval.setMax(100);
+             }
+
+            catch(Exception e){
+
+            }
+        }
+
     }
-
-
-
-
-
     @Override
     public void addCallback(Callback callback) {
 
