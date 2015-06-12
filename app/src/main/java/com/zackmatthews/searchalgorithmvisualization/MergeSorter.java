@@ -93,6 +93,7 @@ public class MergeSorter {
 
                 sortingManager.setDataSet(data);
 
+
                 k++;
             }
 
@@ -103,6 +104,7 @@ public class MergeSorter {
                 k++;
                 i++;
             }
+
 
 
         }
