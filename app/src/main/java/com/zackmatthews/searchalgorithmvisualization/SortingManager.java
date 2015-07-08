@@ -1,58 +1,84 @@
 package com.zackmatthews.searchalgorithmvisualization;
 
 import android.graphics.Point;
+import android.os.Handler;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+
 
 /**
  * Created by zackmathews on 5/7/15.
  */
 public class SortingManager {
 
+    public ArrayList<DataObject> getDataSet() { return dataSet; }
+    public void setDataSet(final ArrayList<DataObject> dataSet) { this.dataSet = dataSet;}
 
 
-    private List<DataObject> dataSet;
+    private Handler handler = new Handler();
+    private ArrayList<DataObject> dataSet = new ArrayList<>();
     private Random rand = new Random();
 
-    public List<DataObject> getDataSet() {
-        return dataSet;
-    }
-    public void setDataSet(List<DataObject> dataSet) { this.dataSet = dataSet;}
-    private MergeSorter mergeSorter;
+    private static MergeSorter mergeSorter;
+    private static boolean isGenerating = false;
 
-    public SortingManager(List<DataObject> dataSet, Point screenSize){
+
+    public SortingManager(final ArrayList<DataObject> dataSet, Point screenSize){
         this.dataSet = dataSet;
 
         if(dataSet == null){ //seed data set if null
             seedData(screenSize, 250);
         }
-         mergeSorter = new MergeSorter(this.dataSet, this); //initialize merge sorter class
+
     }
 
 
-    public void seedData(Point screenSize, int seedInterval){ //seed data
-       List data = new ArrayList();
+    public MergeSorter getMergeSorter(){
+        if(mergeSorter == null){
+            mergeSorter = new MergeSorter(this.dataSet, this); //initialize merge sorter class
+        }
 
-        for(int i = screenSize.x; i > 0; i-- ){
+        return mergeSorter;
+    }
+
+    public void seedData(Point screenSize, int seedInterval){ //seed data
+       ArrayList<DataObject> data = new ArrayList();
+
+        isGenerating = true;
+        for(int i = seedInterval; i > 0; i-- ){
 
             if(i % seedInterval == 0){
-                rand.setSeed(SystemClock.currentThreadTimeMillis());
+                rand.setSeed(SystemClock.currentThreadTimeMillis() * (i*i) - i);
             }
-                int val = rand.nextInt(screenSize.y);
+                int val = rand.nextInt(screenSize.y - rand.nextInt(screenSize.y / 3));
                 data.add(new DataObject(val));
         }
 
 
         setDataSet(data);
-        mergeSorter = new MergeSorter(this.dataSet, this);
+
+        isGenerating = false;
     }
 
 
     public void executeMergeSort(){ //execute merge sort
-       mergeSorter.execute();
+
+        if(!isGenerating && !getMergeSorter().isSorting) {
+            getMergeSorter().setData(getDataSet());
+            getMergeSorter().execute();
+
+        }
+
+        else{
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    executeMergeSort();
+                }
+            }, 250);
+        }
     }
 
 

@@ -1,30 +1,53 @@
 package com.zackmatthews.searchalgorithmvisualization;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by zackmathews on 5/8/15.
  */
 
-
 public class MergeSorter {
 
-    protected List<DataObject> data;
+    protected ArrayList<DataObject> data;
     protected DataObject[] helper; //temp data buffer
     protected SortingManager sortingManager;
+    protected boolean isSorting = false;
 
-    public MergeSorter(List<DataObject> data, SortingManager sortingManager){
+    private Handler handler = new Handler();
+
+    public MergeSorter(ArrayList<DataObject> data, SortingManager sortingManager){
         this.data = data;
         this.sortingManager = sortingManager;
         helper = new DataObject[data.size()];
     }
 
 
+    public void setData(final ArrayList<DataObject> data){
+        if(!isSorting){
+            this.data = data;
+            helper = new DataObject[data.size()];
+        }
+
+        else{
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setData(data);
+                }
+            }, 150);
+        }
+    }
+
     public void execute(){
+        isSorting = true;
         MergeSortAsync mergeSortAsync = new MergeSortAsync();
         mergeSortAsync.execute();
+
     }
 
     private class MergeSortAsync extends AsyncTask<Void, Void, Void>{
@@ -35,9 +58,7 @@ public class MergeSorter {
 
 
             mergeSort(0, data.size() - 1);
-            for(int i = 0; i < data.size(); i++) {
-                Log.v("data at" + i, String.valueOf(data.get(i).getI_val())); //For debugging, prints out sorted data in order
-            }
+            isSorting = false;
             return data;
 
         }

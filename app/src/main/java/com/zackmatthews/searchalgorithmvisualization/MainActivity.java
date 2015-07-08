@@ -8,10 +8,15 @@ import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
 
+
+    RenderView renderView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        renderView = (RenderView)findViewById(R.id.renderView);
+        renderView.initUI();
     }
 
     @Override
